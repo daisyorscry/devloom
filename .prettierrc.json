@@ -1,0 +1,29 @@
+{
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "singleAttributePerLine": false,
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": ["*.tsx", "*.jsx", "*.html"],
+      "options": {
+        "plugins": [
+          "prettier-plugin-tailwindcss",
+          "prettier-plugin-classnames",
+          "prettier-plugin-merge"
+        ],
+        "tailwindStylesheet": "./src/globals.css",
+        "classnamesPrintWidth": 100,
+        "endingPosition": "absolute",
+        "syntaxTransformation": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Optional: mount your own projects alongside the persistent Devloom data volume.
+# DEVLOOM_PROJECTS_DIR must be an existing absolute directory on your host.
+services:
+  devloom:
+    volumes:
+      - type: bind
+        source: ${DEVLOOM_PROJECTS_DIR:?Set DEVLOOM_PROJECTS_DIR to your projects directory}
+        target: /workspace
+        bind:
+          create_host_path: false

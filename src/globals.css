@@ -1,0 +1,241 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@source './**/*.{tsx,ts}';
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --font-*: initial;
+  --font-sans: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-*: initial;
+  --text-small: 14px;
+  --text-body: 16px;
+  --text-heading: 24px;
+  --breakpoint-compact: 700px;
+  --breakpoint-desktop: 1100px;
+  --spacing-inspector: clamp(430px, 54dvh, 550px);
+  --spacing-inspector-offset: calc(var(--spacing-inspector) + 10px);
+  --shadow-dialog: 0 15px 65px #0003;
+  --shadow-drawer: 0 -12px 40px #0001;
+  --animate-drawer: drawer-rise 220ms ease-out;
+
+  --color-canvas: #f8f9f9;
+  --color-surface: #ffffff;
+  --color-panel: #ffffff;
+  --color-control: #f0f2f3;
+  --color-hover: #e7edf2;
+  --color-stripe: #f0f4f7;
+  --color-selected: #dce9f3;
+  --color-table-head: #e9eef2;
+  --color-line: #dfe2e3;
+  --color-ink: #25282b;
+  --color-secondary: #51565c;
+  --color-muted: #60666c;
+  --color-focus: #8a9ca9;
+  --color-primary: #292d2f;
+  --color-on-primary: #ffffff;
+  --color-healthy: #237749;
+  --color-danger: #b43b32;
+  --color-danger-surface: #fff1ef;
+  --color-warning: #976719;
+  --color-warning-surface: #fff4dd;
+  --color-accent: #c65029;
+
+  /* The log console stays dark in both themes. */
+  --color-log-info: #91c9f7;
+  --color-log-success: #94d5ac;
+  --color-log-warn: #e8c27e;
+  --color-log-error: #f2a09c;
+  --color-log-debug: #c3acf1;
+  --color-log-path: #9ed8d1;
+  --color-console: #202428;
+  --color-console-control: #293037;
+  --color-console-hover: #39434b;
+  --color-console-line: #465059;
+  --color-console-text: #d7dadd;
+  --color-console-muted: #b4bbc1;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-synthesis: none;
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    color-scheme: light;
+    --chart-series-1: #5b849e;
+    --chart-series-2: #9180ad;
+    --chart-series-3: #85a191;
+    --chart-series-4: #bc956c;
+    --chart-series-5: #849fae;
+    --chart-series-6: #af8794;
+    --chart-grid: #e5ebef;
+    --chart-axis: #60666c;
+    --chart-line: #587e98;
+    --chart-fill: #e9f0f5;
+    --chart-tooltip: #ffffff;
+    --chart-tooltip-text: #25282b;
+    --chart-tooltip-border: #dce5eb;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-canvas: #181818;
+    --color-surface: #181818;
+    --color-panel: #202020;
+    --color-control: #292929;
+    --color-hover: #383838;
+    --color-stripe: #242424;
+    --color-selected: #424242;
+    --color-table-head: #303030;
+    --color-line: #404040;
+    --color-ink: #eeedea;
+    --color-secondary: #c8c7c3;
+    --color-muted: #acaba7;
+    --color-focus: #b7afa5;
+    --color-primary: #e5e3df;
+    --color-on-primary: #20201f;
+    --color-healthy: #8bcaa5;
+    --color-danger: #f3a49d;
+    --color-danger-surface: #39272a;
+    --color-warning: #e2bd79;
+    --color-warning-surface: #352e20;
+    --color-accent: #e78963;
+    --color-console: #1c1c1c;
+    --color-console-control: #292929;
+    --color-console-hover: #383838;
+    --color-console-line: #404040;
+    --color-console-text: #eeedea;
+    --color-console-muted: #c8c7c3;
+    --chart-series-1: #b5a58b;
+    --chart-series-2: #a895b1;
+    --chart-series-3: #90a28f;
+    --chart-series-4: #bf9874;
+    --chart-series-5: #a6a69a;
+    --chart-series-6: #b79599;
+    --chart-grid: #3d3d3d;
+    --chart-axis: #c8c7c3;
+    --chart-line: #c8ae8c;
+    --chart-fill: #36312b;
+    --chart-tooltip: #2b2b2b;
+    --chart-tooltip-text: #eeedea;
+    --chart-tooltip-border: #54514c;
+  }
+
+  * {
+    box-sizing: border-box;
+    border: 0 solid;
+    scrollbar-width: thin;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+  body,
+  h1,
+  h2,
+  h3,
+  p,
+  dl,
+  dd,
+  pre {
+    margin: 0;
+  }
+  button,
+  input,
+  select,
+  textarea,
+  code,
+  pre,
+  small,
+  kbd,
+  time {
+    font: inherit;
+  }
+  button,
+  input,
+  select,
+  textarea,
+  code,
+  pre,
+  small {
+    font-size: var(--text-small);
+  }
+  button {
+    cursor: pointer;
+    color: inherit;
+  }
+  button:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  input {
+    min-width: 0;
+  }
+  h1 {
+    font-size: var(--text-heading);
+    font-weight: 650;
+    letter-spacing: -0.03em;
+  }
+  h2,
+  h3 {
+    font-size: var(--text-body);
+    font-weight: 600;
+  }
+  p {
+    font-size: var(--text-small);
+    line-height: 1.65;
+  }
+  small {
+    color: var(--color-secondary);
+  }
+  code,
+  pre {
+    font-variant-numeric: tabular-nums;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  svg {
+    flex-shrink: 0;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--color-selected);
+    color: var(--color-ink);
+  }
+}
+
+@keyframes drawer-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
