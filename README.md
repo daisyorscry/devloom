@@ -1,6 +1,21 @@
-# Devloom
+<p align="center">
+  <img src=".github/assets/devloom-mark.svg" width="64" height="64" alt="Devloom loom mark" />
+</p>
+<h1 align="center">Devloom</h1>
+<p align="center"><strong>Weave your services into one workspace.</strong></p>
 
-**Weave your services into one workspace.**
+<p align="center">
+  <a href="https://github.com/daisyorscry/devloom/actions/workflows/ci.yml"><img src="https://github.com/daisyorscry/devloom/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-c65029?style=flat" alt="MIT license" /></a>
+  <a href="#installation"><img src="https://img.shields.io/badge/Node.js-22.12%2B-51565c?style=flat" alt="Node.js 22.12 or newer" /></a>
+</p>
+
+<p align="center">
+  <a href="#installation">Get started</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#contributing">Contribute</a>
+</p>
 
 Devloom is a local development control panel for running services, reading logs, checking health, and exploring application telemetry from one workspace.
 
@@ -8,7 +23,10 @@ Register the commands you already use—an API, worker, scheduler, frontend dev 
 
 The name combines **Development** and **Loom**: a workspace that brings the threads of a development environment together.
 
-![Devloom service dashboard in dark mode](example/services-dark.png)
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="example/services-light.png" />
+  <img src="example/services-dark.png" alt="Devloom dashboard with registered services, runtime status, and workspace controls" />
+</picture>
 
 ## Why Devloom?
 
@@ -48,6 +66,7 @@ The page stays within the viewport. Tables, logs, and other long content scroll 
 Clone or download this repository, then run these commands from its directory:
 
 ```sh
+git clone https://github.com/daisyorscry/devloom.git
 cd devloom
 npm ci
 npm run dev
@@ -510,11 +529,13 @@ The bundled Satoshi font and vendored OpenTelemetry definitions retain their res
 
 Contributions can improve process handling, SDK interoperability, accessibility, performance, documentation, or the everyday development workflow. Keep changes aligned with Devloom's focus on local development.
 
+Read the [contribution guide](.github/CONTRIBUTING.md), open a [bug report or feature request](https://github.com/daisyorscry/devloom/issues/new/choose), and review the [security policy](SECURITY.md) before reporting a vulnerability. Create branches from `dev` and target `dev` in pull requests. Reviewed changes are promoted to `main`.
+
 ### Get started
 
 1. Check existing issues and pull requests for related work.
 2. For a substantial feature or architectural change, open an issue describing the problem and proposed approach before building it.
-3. Fork the repository, clone your fork, and create a focused branch such as `fix/log-filter` or `feat/service-health`.
+3. Fork the repository, clone your fork, check out `dev`, and create a focused branch such as `fix/log-filter` or `feat/service-health`.
 4. Run `npm ci`, then `npm run dev` from the repository root.
 5. Make the change, update relevant documentation, and run the appropriate checks.
 
@@ -539,7 +560,7 @@ Do not commit `node_modules`, build output, `.devloom` data, `.env` files, crede
 
 ### Pull request rules
 
-- Keep each PR focused on one problem or closely related change. Avoid unrelated formatting or refactoring.
+- Target `dev`. Keep each PR focused on one problem or closely related change. Avoid unrelated formatting or refactoring.
 - Use a clear English title that describes the result, such as `Fix service filter after restart`.
 - Explain the problem, the resulting behavior, and any meaningful tradeoffs or limitations. Link related issues when available.
 - Include the checks you ran and their results. State clearly if a relevant check could not be run and why.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the documentation
+    url: https://github.com/daisyorscry/devloom#readme
+    about: Installation, service setup, Docker, OpenTelemetry, and contribution guidelines.
+  - name: Report a security vulnerability privately
+    url: https://github.com/daisyorscry/devloom/security/advisories/new
+    about: Please keep exploitable details out of public issues.

@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a reproducible problem with Devloom.
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first. Include a small reproduction and remove credentials, private paths, and service data from logs.
+        For security vulnerabilities, use [private vulnerability reporting](https://github.com/daisyorscry/devloom/security/advisories/new).
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the actual behavior and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start Devloom with…
+        2. Register a service using…
+        3. Open…
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Service lifecycle or health
+        - Logs
+        - Projects or folder browser
+        - OpenTelemetry traces or metrics
+        - Memory monitoring
+        - Interface or accessibility
+        - Docker or installation
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include your commit/version and whether Devloom runs natively, in Docker, or in WSL.
+      value: |
+        Devloom version or commit:
+        OS and version:
+        Node.js / npm:
+        Browser:
+        Docker / Compose, if used:
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots, or configuration
+      description: For telemetry, include the SDK and exporter protocol. For Docker, include relevant ports and mounts. Sanitized examples only.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and removed sensitive information from this report.
+          required: true
