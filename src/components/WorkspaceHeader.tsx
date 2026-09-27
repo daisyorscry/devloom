@@ -1,6 +1,6 @@
 import { TabButton } from './TabButton';
 import { Button } from './Button';
-import { Loom } from './ServiceIdentity';
+import { BrandMark } from './BrandMark';
 import { CircleHelp, Moon, Sun } from 'lucide-react';
 import type { WorkspaceController } from '../hooks/useWorkspaceController';
 export function WorkspaceHeader({
@@ -35,7 +35,7 @@ export function WorkspaceHeader({
         max-compact:grid-cols-[1fr_auto] max-compact:px-4"
     >
       <a className="brand flex items-center gap-2" href="/" aria-label="Devloom home">
-        <Loom />
+        <BrandMark />
         <strong className="text-heading font-bold tracking-tight">devloom</strong>
       </a>
       <span className="header-divider h-6 w-px bg-line max-desktop:hidden" />

@@ -1,5 +1,5 @@
 import { Button } from './Button';
-import { Loom } from './ServiceIdentity';
+import { BrandMark } from './BrandMark';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 export function Modal({
@@ -32,7 +32,7 @@ export function Modal({
       <div
         className={`modal-top mb-6 flex items-center gap-3 ${size === 'wide' ? 'px-7 pt-6' : ''}`}
       >
-        {size === 'wide' ? <h2 className="flex-1 text-heading">{title}</h2> : <Loom small />}
+        {size === 'wide' ? <h2 className="flex-1 text-heading">{title}</h2> : <BrandMark small />}
         <Button variant="icon" aria-label="Close dialog" onClick={onClose}>
           <X size={18} />
         </Button>

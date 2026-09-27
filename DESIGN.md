@@ -19,6 +19,18 @@ Devloom is a local work surface. The primary tasks are finding a service, changi
 - Tailwind CSS v4 implements the existing design. Theme tokens define the palette and the three text sizes; component styles use short inline utilities. Semantic color tokens adapt to the current theme, so views do not repeat dark-mode overrides.
 - Traces and application metrics display exports received by the local OTLP receiver; empty states explain how to connect a real SDK.
 
+## Brand mark
+
+The mark combines a D-shaped frame with a diagonal thread passing through its left stem.
+The open crossing suggests weaving, while the enclosing D stands for one development workspace.
+Use the copper mark on neutral light or dark surfaces, without a surrounding tile or gradient.
+
+- `public/brand/devloom-mark.svg` is the shared source for the app, favicon, and README.
+- `BrandMark` renders the decorative app icon; its adjacent text or link supplies the accessible name.
+- Keep the viewBox padding and use at least 16px. The wordmark uses the existing Satoshi font.
+- The product name remains Devloom. Hosting under a Runvel domain does not add a Runvel endorsement to the logo.
+- This is a design direction, not a trademark clearance or a claim of exclusive use.
+
 ## References consulted
 
 - [Kosta Canatselis: Spot the Slop](https://world.hey.com/kostac/spot-the-slop-a-ui-designer-s-guide-to-fixing-ai-defaults-4c448c9c): product-specific decisions, state design, progressive disclosure.

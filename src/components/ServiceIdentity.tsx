@@ -1,20 +1,4 @@
 import type { Service } from '../types';
-export function Loom({ small = false }: { small?: boolean }) {
-  return (
-    <svg
-      className="shrink-0 text-accent"
-      width={small ? 20 : 24}
-      height={small ? 22 : 27}
-      viewBox="0 0 24 27"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      aria-hidden="true"
-    >
-      <path d="M4 3v21M11 3v21M18 3v21M1 14l22-8M1 23l22-8" />
-    </svg>
-  );
-}
 export function StatusBadge({ service }: { service: Service }) {
   const color =
     service.status === 'running'

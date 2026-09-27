@@ -1,5 +1,5 @@
 <p align="center">
-  <img src=".github/assets/devloom-mark.svg" width="64" height="64" alt="Devloom loom mark" />
+  <img src="public/brand/devloom-mark.svg" width="64" height="64" alt="Devloom woven D mark" />
 </p>
 <h1 align="center">Devloom</h1>
 <p align="center"><strong>Weave your services into one workspace.</strong></p>
