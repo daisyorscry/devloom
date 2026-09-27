@@ -13,7 +13,25 @@ export function createApp(
   port: number,
   telemetry?: TelemetryStore,
   workspace?: { registry: WorkspaceRegistry; id: string },
+  publicOrigin = process.env.DEVLOOM_PUBLIC_ORIGIN,
 ) {
+  const origins = [`http://127.0.0.1:${port}`, `http://localhost:${port}`];
+  if (publicOrigin) {
+    const url = new URL(publicOrigin);
+    if (
+      !['http:', 'https:'].includes(url.protocol) ||
+      url.username ||
+      url.password ||
+      url.pathname !== '/' ||
+      url.search ||
+      url.hash
+    )
+      throw new Error(
+        'DEVLOOM_PUBLIC_ORIGIN must be an HTTP(S) origin without credentials, path, query or fragment.',
+      );
+    origins.push(url.origin);
+  }
+  const allowedHosts = origins.map((origin) => new URL(origin).host);
   const app = express();
   const token = randomBytes(32).toString('hex');
   const clients = new Set<ServerResponse>();
@@ -22,10 +40,9 @@ export function createApp(
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('X-Frame-Options', 'DENY');
-    const allowed = [`127.0.0.1:${port}`, `localhost:${port}`];
-    if (!allowed.includes(req.headers.host ?? ''))
-      return res.status(403).json({ error: 'Devloom accepts localhost requests only.' });
-    if (req.headers.origin && !allowed.map((host) => `http://${host}`).includes(req.headers.origin))
+    if (!allowedHosts.includes(req.headers.host ?? ''))
+      return res.status(403).json({ error: 'Devloom does not accept this request host.' });
+    if (req.headers.origin && !origins.includes(req.headers.origin))
       return res.status(403).json({ error: 'Cross-origin access is not allowed.' });
     if (req.headers['sec-fetch-site'] === 'cross-site')
       return res.status(403).json({ error: 'Cross-site access is not allowed.' });
