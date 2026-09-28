@@ -68,6 +68,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate Compose
+        env:
+          DEVLOOM_AUTH_USERNAME: ci
+          DEVLOOM_AUTH_PASSWORD: ci-validation-only
         run: docker compose config --quiet
       - name: Build the local image
         run: docker build --tag devloom:ci .
