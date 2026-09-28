@@ -96,3 +96,89 @@ test('API protects mutations, persists CRUD and streams snapshots', async (t) =>
   assert.equal(deleted.status, 204);
   assert.equal((await (await fetch(`${url}/api/services`)).json()).services.length, 0);
 });
+
+test('configured public origin allows tunnel requests without relaxing other checks', async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'devloom-public-origin-'));
+  const manager = new ProcessManager(dir);
+  const server = createServer();
+  await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
+  const port = (server.address() as { port: number }).port;
+  const { app, dispose } = createApp(
+    manager,
+    process.cwd(),
+    port,
+    undefined,
+    undefined,
+    'https://devloom.example.test',
+  );
+  server.on('request', app);
+  t.after(async () => {
+    dispose();
+    await manager.shutdown();
+    server.closeAllConnections();
+    server.close();
+    rmSync(dir, { recursive: true, force: true });
+  });
+  const url = `http://127.0.0.1:${port}`;
+  const send = (path: string, headers: Record<string, string> = {}, body?: string) =>
+    new Promise<{ status: number; body: string }>((resolve, reject) => {
+      const req = request(
+        `${url}${path}`,
+        { method: body === undefined ? 'GET' : 'POST', headers },
+        (res) => {
+          let text = '';
+          res.setEncoding('utf8');
+          res.on('data', (chunk: string) => {
+            text += chunk;
+          });
+          res.on('end', () => resolve({ status: res.statusCode!, body: text }));
+        },
+      );
+      req.on('error', reject);
+      req.end(body);
+    });
+  const headers = {
+    Host: 'devloom.example.test',
+    Origin: 'https://devloom.example.test',
+    'sec-fetch-site': 'same-origin',
+  };
+  const session = await send('/api/session', headers);
+  assert.equal(session.status, 200);
+  const { token } = JSON.parse(session.body);
+  assert.equal((await send('/api/services', headers)).status, 200);
+  for (const invalid of [
+    { Host: 'other.example.test' },
+    { Host: 'devloom.example.test.evil.test' },
+    { Origin: 'http://devloom.example.test' },
+    { Origin: 'https://other.example.test' },
+    { 'sec-fetch-site': 'cross-site' },
+  ])
+    assert.equal((await send('/api/services', { ...headers, ...invalid })).status, 403);
+  const post = (extra: Record<string, string>) =>
+    send(
+      '/api/services',
+      {
+        ...headers,
+        'Content-Type': 'application/json',
+        ...extra,
+      },
+      JSON.stringify({
+        name: 'Tunnel test',
+        directory: process.cwd(),
+        command: process.execPath,
+        args: [],
+      }),
+    );
+  assert.equal((await post({})).status, 403);
+  assert.equal((await post({ 'x-devloom-token': token })).status, 201);
+  assert.equal((await send('/api/services')).status, 200);
+  for (const origin of [
+    'https://example.test/path',
+    'https://user:pass@example.test',
+    'file:///tmp',
+    'https://example.test?query=1',
+    'https://example.test#fragment',
+  ]) {
+    assert.throws(() => createApp(manager, process.cwd(), port, undefined, undefined, origin));
+  }
+});

@@ -249,12 +249,13 @@ Devloom injects the project's endpoint into processes it starts unless the launc
 
 ## Configure Devloom
 
-| Environment variable | Default                                | Purpose                                                                                                      |
-| -------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `DEVLOOM_PORT`       | `4310`                                 | Dashboard and API port.                                                                                      |
-| `DEVLOOM_OTLP_PORT`  | `4318`                                 | OTLP/HTTP receiver port; must differ from the dashboard port.                                                |
-| `DEVLOOM_HOST`       | `127.0.0.1`                            | Bind address for both servers; accepts `127.0.0.1` or `0.0.0.0`. The Docker image uses `0.0.0.0` internally. |
-| `DEVLOOM_DATA_DIR`   | `.devloom` under the working directory | Location of saved service configurations.                                                                    |
+| Environment variable    | Default                                | Purpose                                                                                                                             |
+| ----------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `DEVLOOM_PORT`          | `4310`                                 | Dashboard and API port.                                                                                                             |
+| `DEVLOOM_OTLP_PORT`     | `4318`                                 | OTLP/HTTP receiver port; must differ from the dashboard port.                                                                       |
+| `DEVLOOM_HOST`          | `127.0.0.1`                            | Bind address for both servers; accepts `127.0.0.1` or `0.0.0.0`. The Docker image uses `0.0.0.0` internally.                        |
+| `DEVLOOM_DATA_DIR`      | `.devloom` under the working directory | Location of saved service configurations.                                                                                           |
+| `DEVLOOM_PUBLIC_ORIGIN` | Unset                                  | Optional exact HTTP(S) origin accepted by the dashboard/API, for example `https://devloom.example.com`. Localhost remains accepted. |
 
 For example:
 
@@ -268,6 +269,18 @@ npm run dev
 In this configuration, open `http://localhost:4320` and export telemetry to `http://127.0.0.1:4328`.
 
 Set these variables in the shell that launches Devloom. Devloom does not automatically load a `.env` file.
+
+For an explicitly configured reverse proxy, build Devloom and run it with the public origin:
+
+```sh
+npm run build
+DEVLOOM_PUBLIC_ORIGIN=https://devloom.example.com npm start
+```
+
+Forward the original Host and Origin headers. This enables that exact dashboard origin;
+other hosts, cross-origin requests, and mutations without a session token remain rejected.
+The setting does not add authentication or change the OTLP receiver. Use the compiled build
+behind a tunnel so the frontend does not depend on Vite's development WebSocket connection.
 
 The dashboard/API and OTLP receiver bind to `127.0.0.1` by default. The container binds internally to `0.0.0.0` so Docker can forward its loopback-only published ports. Devloom runs commands with the permissions of the local user. Keep it local; it is not designed to be exposed as a public process-management API.
 
