@@ -165,32 +165,40 @@ then run `docker compose pull && docker compose up -d --no-build`.
 
 ### Automatic Docker Hub images
 
-The GitHub Actions `CI` workflow publishes `daisyorscry/devloom` after the Node.js checks,
-browser tests, and Docker build pass. Pull requests validate changes without publishing.
+The `CI` workflow runs checks on pushes to `dev` and `main`, and on pull requests
+into either branch. Publishing is a separate `Publish Docker image` workflow: it
+runs only after CI succeeds for a push to `main`. It checks out that exact tested
+commit and publishes Linux AMD64 images to `daisyorscry/devloom`.
 
-| Git event                           | Docker Hub tag                              |
-| ----------------------------------- | ------------------------------------------- |
-| Push to `dev`                       | `daisyorscry/devloom:dev`                   |
-| Push to `main`                      | `daisyorscry/devloom:latest`                |
-| Push a version tag such as `v0.2.0` | `daisyorscry/devloom:0.2.0`                 |
-| Every published build               | `daisyorscry/devloom:sha-<full-commit-sha>` |
+| Event                                              | Result                                       |
+| -------------------------------------------------- | -------------------------------------------- |
+| Push to `dev` or a pull request                    | Checks only; no image publish                |
+| Push or merge to `main`, followed by successful CI | Publish `latest` and `sha-<full-commit-sha>` |
+| Version tag or manually dispatched CI              | No image publish                             |
 
-Maintainers must add a repository Actions secret named `DOCKERHUB_TOKEN`, containing a
+Maintainers must add an Actions repository secret named `DOCKERHUB_TOKEN`, containing a
 [Docker Hub access token](https://docs.docker.com/security/access-tokens/) for `daisyorscry`
-with write access to this image repository. Credentials are passed to the registry login
-step, never added to the image. The workflow currently builds Linux AMD64 images.
+with write access to this image repository. The publishing workflow must be present
+on the default branch to receive CI completion events.
 
-To update a running development installation, set `DEVLOOM_IMAGE=daisyorscry/devloom:dev`
-in `.env`, then run:
+Set `DEVLOOM_IMAGE=daisyorscry/devloom:latest` in `.env`, then update an installation with:
 
 ```sh
 docker compose pull
 docker compose up -d --no-build
 ```
 
-Use `daisyorscry/devloom:latest` for the `main` build. Publishing an image does not restart
-existing installations automatically. The workflow can also be run manually on `dev`
-or `main` from the Actions page once it is available on the default branch.
+Publishing updates the registry image; existing installations restart only when you
+run the update commands. To retry a failed publish after setting the secret, use
+**Re-run failed jobs** on the publishing workflow.
+
+### Protected main branch
+
+Changes reach `main` through a pull request. The Node 22 and 24 checks, Chromium
+browser tests, and Docker build must pass against the latest base, and review
+conversations must be resolved. These requirements also apply to administrators;
+force pushes and branch deletion are disabled. A separate reviewer approval is
+not required, so a solo maintainer can merge after the checks pass.
 
 ### Run your services inside the container
 
