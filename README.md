@@ -87,6 +87,10 @@ Run both commands from the repository root. The build compiles the frontend and 
 
 ### Run with Docker Compose
 
+Copy `.env.example` to `.env` and set `DEVLOOM_AUTH_USERNAME` and a strong
+`DEVLOOM_AUTH_PASSWORD` before starting. Compose requires both credentials.
+The browser will show its built-in username/password prompt.
+
 Install Docker Engine with the Compose plugin, or Docker Desktop, and start Docker. You do not need Node.js on the host for this option.
 
 From the repository root:
@@ -128,6 +132,7 @@ Compose reads this file for variable substitution; the native Devloom server doe
 docker build -t devloom:local .
 docker run -d --name devloom --init \
   --stop-timeout 10 \
+  --env-file .env \
   -p 127.0.0.1:4310:4310 \
   -p 127.0.0.1:4318:4318 \
   -v devloom-data:/data \
@@ -135,6 +140,28 @@ docker run -d --name devloom --init \
 ```
 
 Use `docker logs -f devloom`, `docker stop devloom`, and `docker start devloom` to inspect and control it. This command uses its own named volume, separate from Compose's project-prefixed volume. If changing ports, set `DEVLOOM_PORT` / `DEVLOOM_OTLP_PORT` with `-e` and publish those same ports.
+
+### Basic authentication
+
+Set `DEVLOOM_AUTH_USERNAME` and `DEVLOOM_AUTH_PASSWORD` in the server environment
+to protect the dashboard, static assets, all workspace APIs, and live event streams.
+For native use, export both variables before `npm run dev` or `npm start`.
+Native and direct Docker runs keep authentication disabled when both values are
+empty; incomplete credentials cause startup to fail. Docker Compose requires both.
+Passwords may contain colons; usernames may not. Control characters are rejected.
+
+Credentials are supplied at runtime and are never baked into the image. Managed
+services do not inherit these two variables. API clients send the standard
+`Authorization: Basic <base64(username:password)>` header; mutations still require
+the existing `x-devloom-token` session token. Browsers cache Basic Auth credentials;
+close the browser session to clear them.
+
+Keep the existing localhost bindings. Basic Auth does not encrypt HTTP traffic;
+use HTTPS if forwarding access through a trusted proxy. The separate local OTLP
+receiver on port 4318 retains its existing ingestion behavior without Basic Auth.
+
+To use a published image with Compose, set `DEVLOOM_IMAGE` to its Docker Hub tag,
+then run `docker compose pull && docker compose up -d --no-build`.
 
 ### Run your services inside the container
 

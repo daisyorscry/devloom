@@ -367,6 +367,8 @@ export class ProcessManager extends EventEmitter {
       stdio: ['ignore', 'pipe', 'pipe'],
       env: {
         ...process.env,
+        DEVLOOM_AUTH_USERNAME: undefined,
+        DEVLOOM_AUTH_PASSWORD: undefined,
         FORCE_COLOR: '0',
         PYTHONUNBUFFERED: '1',
         OTEL_SERVICE_NAME: r.service.name,
