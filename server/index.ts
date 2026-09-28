@@ -4,10 +4,12 @@ import { existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import express from 'express';
 import { WorkspaceRegistry } from './workspaces.js';
+import { basicAuth } from './auth.js';
 
 if (process.platform === 'win32')
   throw new Error('Devloom currently supports macOS and Linux. On Windows, use WSL.');
 const projectRoot = process.cwd();
+const authenticate = basicAuth();
 const port = Number(process.env.DEVLOOM_PORT || 4310);
 if (!Number.isInteger(port) || port < 1 || port > 65535)
   throw new Error('DEVLOOM_PORT must be between 1 and 65535.');
@@ -27,6 +29,7 @@ const receiver = await createReceiver(
   (id) => workspaces.context(id)?.telemetry,
 );
 const app = express();
+app.use(authenticate);
 app.use(workspaces.middleware());
 const server = createServer(app);
 const production = import.meta.url.includes('/dist/server/');

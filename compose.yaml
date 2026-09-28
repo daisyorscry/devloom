@@ -1,7 +1,7 @@
 services:
   devloom:
     build: .
-    image: devloom:local
+    image: ${DEVLOOM_IMAGE:-devloom:local}
     init: true
     restart: unless-stopped
     stop_grace_period: 10s
@@ -10,6 +10,8 @@ services:
       DEVLOOM_PORT: ${DEVLOOM_PORT:-4310}
       DEVLOOM_OTLP_PORT: ${DEVLOOM_OTLP_PORT:-4318}
       DEVLOOM_DATA_DIR: /data
+      DEVLOOM_AUTH_USERNAME: ${DEVLOOM_AUTH_USERNAME:?Set DEVLOOM_AUTH_USERNAME in .env}
+      DEVLOOM_AUTH_PASSWORD: ${DEVLOOM_AUTH_PASSWORD:?Set DEVLOOM_AUTH_PASSWORD in .env}
     ports:
       - '127.0.0.1:${DEVLOOM_PORT:-4310}:${DEVLOOM_PORT:-4310}'
       - '127.0.0.1:${DEVLOOM_OTLP_PORT:-4318}:${DEVLOOM_OTLP_PORT:-4318}'
