@@ -163,6 +163,43 @@ receiver on port 4318 retains its existing ingestion behavior without Basic Auth
 To use a published image with Compose, set `DEVLOOM_IMAGE` to its Docker Hub tag,
 then run `docker compose pull && docker compose up -d --no-build`.
 
+### Automatic Docker Hub images
+
+The `CI` workflow runs checks on pushes to `dev` and `main`, and on pull requests
+into either branch. Publishing is a separate `Publish Docker image` workflow: it
+runs only after CI succeeds for a push to `main`. It checks out that exact tested
+commit and publishes Linux AMD64 images to `daisyorscry/devloom`.
+
+| Event                                              | Result                                       |
+| -------------------------------------------------- | -------------------------------------------- |
+| Push to `dev` or a pull request                    | Checks only; no image publish                |
+| Push or merge to `main`, followed by successful CI | Publish `latest` and `sha-<full-commit-sha>` |
+| Version tag or manually dispatched CI              | No image publish                             |
+
+Maintainers must add an Actions repository secret named `DOCKERHUB_TOKEN`, containing a
+[Docker Hub access token](https://docs.docker.com/security/access-tokens/) for `daisyorscry`
+with write access to this image repository. The publishing workflow must be present
+on the default branch to receive CI completion events.
+
+Set `DEVLOOM_IMAGE=daisyorscry/devloom:latest` in `.env`, then update an installation with:
+
+```sh
+docker compose pull
+docker compose up -d --no-build
+```
+
+Publishing updates the registry image; existing installations restart only when you
+run the update commands. To retry a failed publish after setting the secret, use
+**Re-run failed jobs** on the publishing workflow.
+
+### Protected main branch
+
+Changes reach `main` through a pull request. The Node 22 and 24 checks, Chromium
+browser tests, and Docker build must pass against the latest base, and review
+conversations must be resolved. These requirements also apply to administrators;
+force pushes and branch deletion are disabled. A separate reviewer approval is
+not required, so a solo maintainer can merge after the checks pass.
+
 ### Run your services inside the container
 
 **Containerized Devloom starts services inside its container.** It cannot manage existing host processes. Its projects are logical workspaces within that container, not separate containers, networks, or security boundaries. Run Devloom natively if you want to use runtimes and project paths already installed on your host.
@@ -427,7 +464,7 @@ With Devloom running, use a second terminal in the repository root:
 npm run demo:telemetry
 ```
 
-This exports a `POST /checkout` trace with four spans and two metrics under **Checkout example**, then exits. In **Traces**, open the trace to see its waterfall. In **Metrics → Application metrics**, search for `checkout.requests` or `checkout.duration`.
+This exports a `POST /checkout` trace with four spans and two metrics under **Checkout example**, then exits. In **Traces**, open the trace to explore **Process flow**, **Service sequence**, and **Timeline**. Every span sharing the same trace ID belongs to one process, including spans from different services. Select any step to inspect its attributes and events; your selection stays when switching diagrams. Parent spans that have not arrived are labeled explicitly. The timeline shows elapsed time and overlapping work, while the other diagrams show parent–child relationships. In **Metrics → Application metrics**, search for `checkout.requests` or `checkout.duration`.
 
 If the receiver uses a custom port:
 

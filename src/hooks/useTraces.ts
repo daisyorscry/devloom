@@ -53,7 +53,8 @@ export function useTraces(version: number) {
         `${t.name} ${t.id} ${t.services.join(' ')}`.toLowerCase().includes(query.toLowerCase()),
     ) ?? [];
   const trace = snapshot?.traces.find((t) => t.id === traceId);
-  const span = spans.find((s) => s.spanId === spanId);
+  const currentSpans = spans.filter((s) => s.traceId === traceId);
+  const span = currentSpans.find((s) => s.spanId === spanId);
   function filterService(value: string) {
     setService(value);
     setTraceId('');
@@ -67,7 +68,7 @@ export function useTraces(version: number) {
     error,
     traceId,
     setTraceId,
-    spans,
+    spans: currentSpans,
     spanId,
     setSpanId,
     setup,
