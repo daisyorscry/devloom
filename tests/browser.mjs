@@ -23,6 +23,8 @@ const base = `http://127.0.0.1:${port}`;
 const server = spawn(process.execPath, ['dist/server/server/index.js'], {
   env: {
     ...process.env,
+    DEVLOOM_AUTH_USERNAME: '',
+    DEVLOOM_AUTH_PASSWORD: '',
     DEVLOOM_PORT: String(port),
     DEVLOOM_OTLP_PORT: String(otlpPort),
     DEVLOOM_DATA_DIR: dataDir,
