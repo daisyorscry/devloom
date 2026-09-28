@@ -330,10 +330,75 @@ try {
     timeout: 10000,
   });
   await page.getByRole('button', { name: 'POST /checkout', exact: true }).click();
+  await expect(page.locator('.trace-flow-step')).toHaveCount(4);
+  await page.locator('.trace-flow-step').first().click();
+  await expect(page.getByRole('complementary', { name: 'Step details' })).toContainText('POST');
+  await page.getByRole('button', { name: 'Service sequence', exact: true }).click();
+  await expect(page.locator('.trace-flow-step')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Timeline', exact: true }).click();
   await expect(page.locator('.waterfall-row')).toHaveCount(4);
   await page.locator('.waterfall-row').first().click();
   await expect(page.locator('.span-inspector')).toContainText('POST');
   await page.screenshot({ path: '.devloom/artifacts/verified-traces.png' });
+  await page.getByRole('button', { name: 'All traces', exact: true }).click();
+  // One distributed trace, exported out of order by three different services.
+  const flowTrace = 'f'.repeat(32);
+  const nanos = BigInt(Date.now()) * 1000000n;
+  const flowResponse = await fetch(`http://127.0.0.1:${otlpPort}/v1/traces`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      resourceSpans: [
+        ['Database', '3', '2', 'SELECT orders', 20, 30],
+        ['Gateway', '1', '', 'POST /flow-test', 0, 80],
+        ['Orders', '2', '1', 'Create order', 10, 60],
+      ].map(([service, id, parent, name, start, end]) => ({
+        resource: { attributes: [{ key: 'service.name', value: { stringValue: service } }] },
+        scopeSpans: [
+          {
+            spans: [
+              {
+                traceId: flowTrace,
+                spanId: id.repeat(16),
+                parentSpanId: parent.repeat(16),
+                name,
+                startTimeUnixNano: String(nanos + BigInt(start) * 1000000n),
+                endTimeUnixNano: String(nanos + BigInt(end) * 1000000n),
+                kind: 2,
+                status: { code: id === '3' ? 2 : 1 },
+              },
+            ],
+          },
+        ],
+      })),
+    }),
+  });
+  assert.equal(flowResponse.status, 200);
+  await page.getByRole('button', { name: 'POST /flow-test', exact: true }).click();
+  await expect(page.locator('.trace-flow-step')).toHaveCount(3);
+  await expect(page.getByRole('region', { name: 'Trace details' })).toContainText('3 services');
+  await page.getByRole('button', { name: 'Inspect Database: SELECT orders', exact: true }).click();
+  await expect(page.getByRole('complementary', { name: 'Step details' })).toContainText('Database');
+  const traceTheme = await page.locator('html').getAttribute('data-theme');
+  if (traceTheme === 'dark')
+    await page.getByRole('button', { name: 'Switch to light mode' }).click();
+  await page.screenshot({ path: '.devloom/artifacts/trace-flow-light.png' });
+  await page.getByRole('button', { name: 'Service sequence', exact: true }).click();
+  await expect(page.locator('.trace-flow-step[aria-pressed="true"]')).toContainText(
+    'SELECT orders',
+  );
+  await page.screenshot({ path: '.devloom/artifacts/trace-sequence-light.png' });
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+  await page.screenshot({ path: '.devloom/artifacts/trace-sequence-dark.png' });
+  await page.getByRole('button', { name: 'Process flow', exact: true }).click();
+  await page.screenshot({ path: '.devloom/artifacts/trace-flow-dark.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await expect(page.getByRole('button', { name: 'Timeline', exact: true })).toBeVisible();
+  await page.screenshot({ path: '.devloom/artifacts/trace-flow-mobile.png' });
+  await page.setViewportSize({ width: 1440, height: 950 });
+  if (traceTheme === 'light')
+    await page.getByRole('button', { name: 'Switch to light mode' }).click();
   // Both the lazy chart bundle and its initial data have an explicit pending state.
   let releaseMetrics;
   const metricsGate = new Promise((resolve) => {

@@ -163,6 +163,35 @@ receiver on port 4318 retains its existing ingestion behavior without Basic Auth
 To use a published image with Compose, set `DEVLOOM_IMAGE` to its Docker Hub tag,
 then run `docker compose pull && docker compose up -d --no-build`.
 
+### Automatic Docker Hub images
+
+The GitHub Actions `CI` workflow publishes `daisyorscry/devloom` after the Node.js checks,
+browser tests, and Docker build pass. Pull requests validate changes without publishing.
+
+| Git event                           | Docker Hub tag                              |
+| ----------------------------------- | ------------------------------------------- |
+| Push to `dev`                       | `daisyorscry/devloom:dev`                   |
+| Push to `main`                      | `daisyorscry/devloom:latest`                |
+| Push a version tag such as `v0.2.0` | `daisyorscry/devloom:0.2.0`                 |
+| Every published build               | `daisyorscry/devloom:sha-<full-commit-sha>` |
+
+Maintainers must add a repository Actions secret named `DOCKERHUB_TOKEN`, containing a
+[Docker Hub access token](https://docs.docker.com/security/access-tokens/) for `daisyorscry`
+with write access to this image repository. Credentials are passed to the registry login
+step, never added to the image. The workflow currently builds Linux AMD64 images.
+
+To update a running development installation, set `DEVLOOM_IMAGE=daisyorscry/devloom:dev`
+in `.env`, then run:
+
+```sh
+docker compose pull
+docker compose up -d --no-build
+```
+
+Use `daisyorscry/devloom:latest` for the `main` build. Publishing an image does not restart
+existing installations automatically. The workflow can also be run manually on `dev`
+or `main` from the Actions page once it is available on the default branch.
+
 ### Run your services inside the container
 
 **Containerized Devloom starts services inside its container.** It cannot manage existing host processes. Its projects are logical workspaces within that container, not separate containers, networks, or security boundaries. Run Devloom natively if you want to use runtimes and project paths already installed on your host.
@@ -427,7 +456,7 @@ With Devloom running, use a second terminal in the repository root:
 npm run demo:telemetry
 ```
 
-This exports a `POST /checkout` trace with four spans and two metrics under **Checkout example**, then exits. In **Traces**, open the trace to see its waterfall. In **Metrics → Application metrics**, search for `checkout.requests` or `checkout.duration`.
+This exports a `POST /checkout` trace with four spans and two metrics under **Checkout example**, then exits. In **Traces**, open the trace to explore **Process flow**, **Service sequence**, and **Timeline**. Every span sharing the same trace ID belongs to one process, including spans from different services. Select any step to inspect its attributes and events; your selection stays when switching diagrams. Parent spans that have not arrived are labeled explicitly. The timeline shows elapsed time and overlapping work, while the other diagrams show parent–child relationships. In **Metrics → Application metrics**, search for `checkout.requests` or `checkout.duration`.
 
 If the receiver uses a custom port:
 
