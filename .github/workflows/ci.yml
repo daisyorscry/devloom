@@ -49,6 +49,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+        env:
+          # The browser test server must ignore credentials inherited from the shell.
+          DEVLOOM_AUTH_USERNAME: ci
+          DEVLOOM_AUTH_PASSWORD: ci-validation-only
       - name: Save browser screenshots
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -68,6 +72,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate Compose
+        env:
+          DEVLOOM_AUTH_USERNAME: ci
+          DEVLOOM_AUTH_PASSWORD: ci-validation-only
         run: docker compose config --quiet
       - name: Build the local image
         run: docker build --tag devloom:ci .
